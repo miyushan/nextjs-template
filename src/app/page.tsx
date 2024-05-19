@@ -1,4 +1,12 @@
 import Image from 'next/image';
+import { z } from 'zod';
+
+const DataSchema = z.object({
+  userId: z.number(),
+  id: z.number(),
+  title: z.string(),
+  body: z.string(),
+});
 
 const getData = async () => {
   const res = await fetch('https://jsonplaceholder.typicode.com/posts/1');
@@ -7,7 +15,15 @@ const getData = async () => {
     throw new Error('Failed to fetch data');
   }
 
-  return res.json();
+  const data = await res.json();
+
+  try {
+    DataSchema.parse(data);
+  } catch (err) {
+    throw new Error('Failed to parse fetched data');
+  }
+
+  return data;
 };
 
 export default async function Home() {
